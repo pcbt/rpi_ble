@@ -25,7 +25,7 @@ tls = {
 }
 
 
-class TestCharacteristic(Characteristic):
+class MqttMessage(Characteristic):
     """
     Dummy test characteristic. Allows writing arbitrary bytes to its value, and
     contains "extended properties", as well as a test descriptor.
@@ -37,16 +37,17 @@ class TestCharacteristic(Characteristic):
         Characteristic.__init__(
                 self, bus, index,
                 self.TEST_CHRC_UUID,
-                ['read', 'write', 'writable-auxiliaries'],
+                ['read', 'write'],
                 service)
         self.value = []
 
     def ReadValue(self, options):
-        print('TestCharacteristic Read: ' + repr(self.value))
+        print("Data reading from Center BLE Device" + repr(self.value))
         return self.value
 
     def WriteValue(self, value, options):
-        print('TestCharacteristic Write: ' + repr(value))
+        print("Sending data from Center BLE Device to Server" + repr(value))
+        publish.single("test",payload=str(value),hostname="mqtt.airchip.com.tr",client_id="bus1",auth=auth,tls=tls,port=8883,protocol=mqtt.MQTTv311)
         self.value = value
 
 
@@ -71,7 +72,7 @@ class BusService(Service):
     BUS_SRV_UUID = '12345678-1234-5678-1234-56789abc0010'
     def __init__(self, bus, index):
         Service.__init__(self, bus, index, self.BUS_SRV_UUID, True)
-        self.add_characteristic(TestCharacteristic(bus, 0, self))
+        self.add_characteristic(MqttMessage(bus, 0, self))
 
 class BusApplication(Application):
     def __init__(self, bus):
