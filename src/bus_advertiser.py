@@ -25,13 +25,9 @@ tls = {
 }    
     
 class PushMqttMessage(Characteristic):
-    PUSH_UUID = '12345678-1234-5678-1234-56789abc000'
+    MQTT_UUID = '12345678-1234-5678-1234-56789abc000'
     def __init__(self, bus, index, service):
-        Characteristic.__init__(
-            self, bus, index,
-            self.PUSH_UUID,
-            ['read', 'write'],
-            service)
+        Characteristic.__init__(self, bus, index,self.MQTT_UUID,['read', 'write'],service)
         self.value = 13
 
     def ReadValue(self, options):
