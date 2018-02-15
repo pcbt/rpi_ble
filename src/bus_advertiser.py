@@ -9,7 +9,7 @@ try:
 except ImportError:
     import gobject as GObject
 
-from Adafruit_LED_Backpack import BicolorMatrix8x8
+
 
 from bluez_ import *
 
