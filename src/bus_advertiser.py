@@ -22,7 +22,34 @@ auth = {
 
 tls = {
   'ca_certs':"/etc/ssl/certs/ca-certificates.crt",
-}    
+}
+
+
+class TestCharacteristic(Characteristic):
+    """
+    Dummy test characteristic. Allows writing arbitrary bytes to its value, and
+    contains "extended properties", as well as a test descriptor.
+
+    """
+    TEST_CHRC_UUID = '12345678-1234-5678-1234-56789abcdef1'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.TEST_CHRC_UUID,
+                ['read', 'write', 'writable-auxiliaries'],
+                service)
+        self.value = []
+
+    def ReadValue(self, options):
+        print('TestCharacteristic Read: ' + repr(self.value))
+        return self.value
+
+    def WriteValue(self, value, options):
+        print('TestCharacteristic Write: ' + repr(value))
+        self.value = value
+
+
     
 class PushMqttMessage(Characteristic):
     MQTT_UUID = '12345678-1234-5678-1234-56789abc000'
@@ -44,7 +71,7 @@ class BusService(Service):
     BUS_SRV_UUID = '12345678-1234-5678-1234-56789abc0010'
     def __init__(self, bus, index):
         Service.__init__(self, bus, index, self.BUS_SRV_UUID, True)
-        self.add_characteristic(PushMqttMessage(bus, 0, self))
+        self.add_characteristic(TestCharacteristic(bus, 0, self))
 
 class BusApplication(Application):
     def __init__(self, bus):
@@ -127,6 +154,7 @@ def main():
                                      reply_handler=register_ad_cb,
                                      error_handler=register_ad_error_cb)
 
+    print('ofset\n')
     try:
         mainloop.run()
     except KeyboardInterrupt:
