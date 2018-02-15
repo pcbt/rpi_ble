@@ -97,19 +97,15 @@ def main():
     bus = dbus.SystemBus()
 
     # Get ServiceManager and AdvertisingManager
-    #service_manager = get_service_manager(bus)
+    service_manager = get_service_manager(bus)
     
-    service_manager = dbus.Interface(
-            bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-            GATT_MANAGER_IFACE)
+
     
     
-    #ad_manager = get_ad_manager(bus)
+    ad_manager = get_ad_manager(bus)
     
     
     
-    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-                                LE_ADVERTISING_MANAGER_IFACE)
 
     # Create gatt services
     app = BusApplication(bus)
@@ -123,6 +119,8 @@ def main():
     service_manager.RegisterApplication(app.get_path(), {},
                                         reply_handler=register_app_cb,
                                         error_handler=register_app_error_cb)
+    
+    print('ofset\n')
 
     # Register advertisement
     ad_manager.RegisterAdvertisement(test_advertisement.get_path(), {},
