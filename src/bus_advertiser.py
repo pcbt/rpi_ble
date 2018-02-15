@@ -27,7 +27,7 @@ tls = {
 class PushMqttMessage(Characteristic):
     MQTT_UUID = '12345678-1234-5678-1234-56789abc000'
     def __init__(self, bus, index, service):
-        Characteristic.__init__(self, bus, index,self.MQTT_UUID,['read', 'write'],service)
+        Characteristic.__init__(self, bus, index, self.MQTT_UUID, ['read', 'write'], service)
         self.value = 13
 
     def ReadValue(self, options):
@@ -97,8 +97,19 @@ def main():
     bus = dbus.SystemBus()
 
     # Get ServiceManager and AdvertisingManager
-    service_manager = get_service_manager(bus)
-    ad_manager = get_ad_manager(bus)
+    #service_manager = get_service_manager(bus)
+    
+    service_manager = dbus.Interface(
+            bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+            GATT_MANAGER_IFACE)
+    
+    
+    #ad_manager = get_ad_manager(bus)
+    
+    
+    
+    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+                                LE_ADVERTISING_MANAGER_IFACE)
 
     # Create gatt services
     app = BusApplication(bus)
